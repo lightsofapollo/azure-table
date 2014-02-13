@@ -22,10 +22,6 @@ suite('client', function() {
     };
 
     setup(function() {
-      return subject.fetchSharedSignature(entity);
-    });
-
-    setup(function() {
       return subject.insertEntity(entity);
     });
 
