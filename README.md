@@ -1,6 +1,6 @@
 # azure-table
 
-Simplified azure table service client for node and the browser.
+Simplified azure table for the browser (tested on latest FirefoxNightly & Chrome only).
 
 ## Usage
 
