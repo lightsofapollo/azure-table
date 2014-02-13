@@ -16,7 +16,8 @@ module.exports = function(config) {
     files: [
       '*.js',
       'vendor/*.js',
-      'test/*.js'
+      'test/config.js',
+      'test/chai.js',
     ],
 
 
@@ -75,7 +76,8 @@ module.exports = function(config) {
     preprocessors: {
       '*.js': ['commonjs'],
       'vendor/*.js': ['commonjs'],
-      'test/*.js': ['commonjs']
+      'test/config.js': ['commonjs'],
+      'test/chai.js': ['commonjs']
     },
 
     plugins: [
