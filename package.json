@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "description": "Simplified azure table service client for node and the browser.",
   "main": "index.js",
-  "scripts": {
-    "test": "make test"
-  },
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git://github.com/lightsofapollo/azure-table.git"
@@ -30,7 +28,6 @@
     "karma-firefox-launcher": "~0.1.3",
     "karma-html2js-preprocessor": "~0.1.0",
     "karma-jasmine": "~0.1.5",
-    "requirejs": "~2.1.10",
     "karma-requirejs": "~0.2.1",
     "karma-coffee-preprocessor": "~0.1.2",
     "karma-phantomjs-launcher": "~0.1.2",
@@ -40,12 +37,9 @@
     "karma-commonjs": "0.0.6",
     "azure": "~0.8.1",
     "azure-sas": "0.0.1",
-    "supertest": "~0.9.0",
     "express": "~3.4.8",
     "superagent": "~0.16.0",
-    "cors": "~2.1.1"
-  },
-  "dependencies": {
-    "cors": "~2.1.1"
+    "cors": "~2.1.1",
+    "component": "~0.19.5"
   }
 }
