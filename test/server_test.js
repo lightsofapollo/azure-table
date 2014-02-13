@@ -4,10 +4,8 @@ suite('signing server', function() {
   var config = require('./config');
 
   setup(function(done) {
-    require('./server')(function(err, server) {
-      if (err) return callback(err);
-      server.once('listening', done);
-    });
+    var server = require('./server')();
+    server.once('listening', done);
   });
 
   test('get signed query params from azure', function(done) {

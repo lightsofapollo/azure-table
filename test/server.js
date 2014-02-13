@@ -6,10 +6,11 @@ var config = require('./config');
 var express = require('express');
 
 function ensureTable(callback) {
-  tableService.createTable(config.table, callback);
+  tableService.createTable(config.table, function() {
+  });
 }
 
-function factory(callback) {
+function factory() {
   // create the server
   var host = URL.parse(config.url);
   var app = express();
@@ -22,15 +23,9 @@ function factory(callback) {
     }));
   });
 
-  // ensure the table is created before exposing our test server.
-  ensureTable(function() {
-    var server = app.listen(host.port);
+  ensureTable();
 
-    if (typeof callback === 'function')
-      callback(null, server);
-  });
-
-  return app;
+  return app.listen(host.port);
 }
 
 module.exports = factory;
