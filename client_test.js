@@ -1,11 +1,8 @@
 suite('client', function() {
-  require('./vendor/mocha-as-promised')();
-
   var Client = require('./client');
-
-  var request = require('./vendor/superagent');
+  var request = require('superagent');
   var config = require('./test/config');
-  var assert = require('./test/chai');
+  var assert = require('chai').assert;
 
   var subject;
   setup(function() {

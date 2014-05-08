@@ -4,12 +4,23 @@
   "description": "Azure table interface",
   "version": "0.0.1",
   "keywords": [],
-  "dependencies": {},
-  "development": {},
+  "dependencies": {
+    "visionmedia/superagent": "~0.18.0",
+    "lightsofapollo/superagent-promise": "0.1.1"
+  },
+  "development": {
+    "dependencies": {
+      "chaijs/chai": "^1.9.1"
+    },
+    "scripts": [
+      "test/records.js",
+      "test/config.js",
+      "*_test.js"
+    ]
+  },
   "license": "MIT",
   "main": "client.js",
   "scripts": [
-    "vendor/superagent.js",
     "client.js"
   ]
 }

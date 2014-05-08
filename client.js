@@ -1,25 +1,4 @@
-var superagent = require('./vendor/superagent');
-
-/**
-Convert a callback style method to a promise returning method.
-
-@param {Function} method to use.
-@param {Object} ctx to apply method.
-*/
-function denodeify(method, ctx) {
-  return function() {
-    var args = Array.prototype.slice.call(arguments);
-
-    return new Promise(function(accept, reject) {
-      args.push(function(err, value) {
-        if (err) return reject(err);
-        return accept(value);
-      });
-
-      method.apply(ctx, args);
-    });
-  };
-}
+var superagent = require('superagent-promise');
 
 /**
 Wrap a method to ensure we have a signature before sending it.
@@ -51,8 +30,6 @@ Create the superagent request and add the constant values.
 function request(method, path) {
   var req = superagent(method, path);
   req.set('Accept', 'application/json;odata=nometadata');
-  req.end = denodeify(req.end, req);
-
   return req;
 }
 
