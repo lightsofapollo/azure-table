@@ -21,7 +21,7 @@
     ]
   },
   "license": "MIT",
-  "main": "index.js",
+  "main": "browser.js",
   "scripts": [
     "adapter/fetch_signature.js",
     "request.js"

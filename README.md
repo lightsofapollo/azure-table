@@ -1,30 +1,32 @@
 # azure-table
 
-Simplified azure table for the browser (tested on latest FirefoxNightly & Chrome only).
+Azure table library for node & browsers
 
 ## Usage
 
 (azure_table can be used with component or requirejs but I am going
-to show the global exposed version).
-
-Include [azure_table.js](build/azure_table.js) somewhere then:
-
+to show the common js version).
 
 ```js
-// azure still needs some signed query parameters, etc.. to make
+var adapter = require('azure-table/adapter/fetch_signature')(
+  // XXX: See test/server for example of what the server should domains
+  '/azure/sign'
+);
+
 // requests see test/server.js for an example server implementation.
-var client = new AzureTable({
-  signUrl: '/sign'
+var table = require('azure-table/request')(
+  'myTable',
+  adapter
+)
+
+// this is a superagent request
+var request = table.queryEntities();
+request.query('$top', 10);
+
+request.end().then(function(res) {
+  // res.body
 });
 
-// fetch the top 10 records in the table
-client.buildQuery({ '$top': 10 }).then(function(records) {
-});
-
-// build query simply passes the query parameters for now.
-client.buildQuery({
-  '$filter': "(PartitionKey eq 'xfoo')"
-});
 ```
 
 ## Notes

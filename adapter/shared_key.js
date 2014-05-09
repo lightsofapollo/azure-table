@@ -1,8 +1,5 @@
 /**
-@fileoverview
-
-The shared key adapter is designed for server side usage where the azure credentials
-can be known and used to sign the urls directly.
+@module azure-table/adapter/shared_key
 */
 
 var azureSign = require('azure-sign/table');
@@ -39,8 +36,12 @@ function signRequest(request) {
   request.set('Authorization', auth);
 }
 
-// XXX: Should we allow options or just expect everyone to use the standard
-//      azure environment variables?
+/**
+The shared key adapter is designed for server side usage where the azure credentials
+can be known and used to sign the urls directly.
+
+@alias module:azure-table/adapter/shared_key
+*/
 function adapter() {
   return function(subject) {
     // fill in the host

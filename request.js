@@ -1,9 +1,5 @@
 /**
 @module azure-table/request
-
-The request module handles creation of http request for azure resources. The Goal
-is to provide a minimal level of abstraction on top of http so high level abstractions
-can be built without compromising low level capabilities.
 */
 
 var request = require('superagent-promise');
@@ -36,12 +32,13 @@ function assertResponseOk(res) {
 }
 
 /**
-The request object is designed around a specific table and provides azure http verbs (like inserting a entity)
-for that table. Most methods return a Superagent request and can be extended at will.
+The reques module handles creation of http request for azure resources. The Goal
+is to provide a minimal level of abstraction on top of http so high level abstractions
+can be built without compromising low level capabilities.
 
 
-@constructor
 @alias module:azure-table/request
+@constructor
 @param {String} tableName for this request object.
 @param {Object} adapter (one of azure-table/adapter/* or your own)
 @example
@@ -117,13 +114,13 @@ Request.prototype = {
   },
 
   /**
-  Build an http request for a query.
+  Build an http request for a queryEntities.
 
-  @param {Object} options to limit query (these are not headers)
+  @param {Object} options to limit queryEntities (these are not headers)
   @see http://msdn.microsoft.com/en-us/library/azure/dd179405.aspx
   @return {Superagent}
   */
-  query: function(options) {
+  queryEntities: function(options) {
     var req = this.request(
       'GET',
       tableUrl(this.table, options || {})
@@ -134,13 +131,13 @@ Request.prototype = {
 
   /**
   This method is a shortcut for a common operation of fetching a single entity by it's 
-  RowKey & PartitionKey and is a wrapper for the `query` method.
+  RowKey & PartitionKey and is a wrapper for the `queryEntities` method.
 
   @see http://msdn.microsoft.com/en-us/library/azure/dd179421.aspx
   @return {Superagent}
   */
   getEntity: function(entity) {
-    return this.query({
+    return this.queryEntities({
       RowKey: entity.RowKey,
       PartitionKey: entity.PartitionKey
     })

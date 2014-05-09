@@ -101,13 +101,13 @@ suite('request', function() {
     });
   });
 
-  suite('#query', function() {
+  suite('#queryEntities', function() {
     setup(function() {
       return subject.insertEntity(entity);
     });
 
-    test('query', function() {
-      var q = subject.query();
+    test('queryEntities', function() {
+      var q = subject.queryEntities();
       var filter = "(PartitionKey eq '" + entity.PartitionKey + "') and " +
                    "(RowKey eq '" + entity.RowKey + "')";
 

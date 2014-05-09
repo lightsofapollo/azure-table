@@ -29,3 +29,6 @@ test: test-node test-browser
 server:
 	@echo "Starting dev server"
 	node test/server.js
+
+doc:
+	./node_modules/.bin/jsdoc -c jsdoc.json -d doc request.js adapter/*.js README.md

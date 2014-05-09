@@ -1,18 +1,5 @@
 /**
-@fileoverview
-
-The fetch signature method is designed for browser usage (though it will work in node)
-it expects the server at a particular url to return a signed signature.
-
-For example if your url is set to `/azure/sign` then azure sign would be expected to respond
-with a json body like this:
-
-  {
-    host: 'https://..',
-    // table SAS query parameters
-    query: { rv: '..' }
-  }
-
+@module azure-table/adapter/fetch_signature
 */
 
 var superagent = require('superagent-promise');
@@ -22,6 +9,22 @@ function signRequestWithSAS(request, sas) {
   request.query(sas.query);
 }
 
+/**
+The fetch signature method is designed for browser usage (though it will work in node)
+it expects the server at a particular url to return a signed signature.
+
+For example if your url is set to `/azure/sign` then azure sign would be expected to respond
+with a json body like this:
+```json
+{
+  host: 'https://..',
+  // table SAS query parameters
+  query: { rv: '..' }
+}
+```
+@alias module:azure-table/adapter/fetch_signature
+@param {String} url to issue request to.
+*/
 function adapter(url) {
   // in memory cache for this adapter;
   var sasRequest = null;
