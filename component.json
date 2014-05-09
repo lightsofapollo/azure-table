@@ -15,7 +15,8 @@
     },
     "scripts": [
       "test/records.js",
-      "test/config.js",
+      "test/request.js",
+      "test/config/*.js",
       "*_test.js"
     ]
   },
