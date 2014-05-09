@@ -1,40 +1,22 @@
+
 ;(function(){
 
 /**
- * Require the given path.
+ * Require the module at `name`.
  *
- * @param {String} path
+ * @param {String} name
  * @return {Object} exports
  * @api public
  */
 
-function require(path, parent, orig) {
-  var resolved = require.resolve(path);
+function require(name) {
+  var module = require.modules[name];
+  if (!module) throw new Error('failed to require "' + name + '"');
 
-  // lookup failed
-  if (null == resolved) {
-    orig = orig || path;
-    parent = parent || 'root';
-    var err = new Error('Failed to require "' + orig + '" from "' + parent + '"');
-    err.path = orig;
-    err.parent = parent;
-    err.require = true;
-    throw err;
-  }
-
-  var module = require.modules[resolved];
-
-  // perform real require()
-  // by invoking the module's
-  // registered function
-  if (!module._resolving && !module.exports) {
-    var mod = {};
-    mod.exports = {};
-    mod.client = mod.component = true;
-    module._resolving = true;
-    module.call(this, mod.exports, require.relative(resolved), mod);
-    delete module._resolving;
-    module.exports = mod.exports;
+  if (!('exports' in module) && typeof module.definition === 'function') {
+    module.client = module.component = true;
+    module.definition.call(this, module.exports = {}, module);
+    delete module.definition;
   }
 
   return module.exports;
@@ -47,363 +29,33 @@ function require(path, parent, orig) {
 require.modules = {};
 
 /**
- * Registered aliases.
- */
-
-require.aliases = {};
-
-/**
- * Resolve `path`.
+ * Register module at `name` with callback `definition`.
  *
- * Lookup:
- *
- *   - PATH/index.js
- *   - PATH.js
- *   - PATH
- *
- * @param {String} path
- * @return {String} path or null
- * @api private
- */
-
-require.resolve = function(path) {
-  if (path.charAt(0) === '/') path = path.slice(1);
-
-  var paths = [
-    path,
-    path + '.js',
-    path + '.json',
-    path + '/index.js',
-    path + '/index.json'
-  ];
-
-  for (var i = 0; i < paths.length; i++) {
-    var path = paths[i];
-    if (require.modules.hasOwnProperty(path)) return path;
-    if (require.aliases.hasOwnProperty(path)) return require.aliases[path];
-  }
-};
-
-/**
- * Normalize `path` relative to the current path.
- *
- * @param {String} curr
- * @param {String} path
- * @return {String}
- * @api private
- */
-
-require.normalize = function(curr, path) {
-  var segs = [];
-
-  if ('.' != path.charAt(0)) return path;
-
-  curr = curr.split('/');
-  path = path.split('/');
-
-  for (var i = 0; i < path.length; ++i) {
-    if ('..' == path[i]) {
-      curr.pop();
-    } else if ('.' != path[i] && '' != path[i]) {
-      segs.push(path[i]);
-    }
-  }
-
-  return curr.concat(segs).join('/');
-};
-
-/**
- * Register module at `path` with callback `definition`.
- *
- * @param {String} path
+ * @param {String} name
  * @param {Function} definition
  * @api private
  */
 
-require.register = function(path, definition) {
-  require.modules[path] = definition;
-};
-
-/**
- * Alias a module definition.
- *
- * @param {String} from
- * @param {String} to
- * @api private
- */
-
-require.alias = function(from, to) {
-  if (!require.modules.hasOwnProperty(from)) {
-    throw new Error('Failed to alias "' + from + '", it does not exist');
-  }
-  require.aliases[to] = from;
-};
-
-/**
- * Return a require function relative to the `parent` path.
- *
- * @param {String} parent
- * @return {Function}
- * @api private
- */
-
-require.relative = function(parent) {
-  var p = require.normalize(parent, '..');
-
-  /**
-   * lastIndexOf helper.
-   */
-
-  function lastIndexOf(arr, obj) {
-    var i = arr.length;
-    while (i--) {
-      if (arr[i] === obj) return i;
-    }
-    return -1;
-  }
-
-  /**
-   * The relative require() itself.
-   */
-
-  function localRequire(path) {
-    var resolved = localRequire.resolve(path);
-    return require(resolved, parent, path);
-  }
-
-  /**
-   * Resolve relative to the parent.
-   */
-
-  localRequire.resolve = function(path) {
-    var c = path.charAt(0);
-    if ('/' == c) return path.slice(1);
-    if ('.' == c) return require.normalize(p, path);
-
-    // resolve deps by returning
-    // the dep in the nearest "deps"
-    // directory
-    var segs = parent.split('/');
-    var i = lastIndexOf(segs, 'deps') + 1;
-    if (!i) i = 0;
-    path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
-    return path;
+require.register = function (name, definition) {
+  require.modules[name] = {
+    definition: definition
   };
+};
 
-  /**
-   * Check if module is defined at `path`.
-   */
+/**
+ * Define a module's exports immediately with `exports`.
+ *
+ * @param {String} name
+ * @param {Generic} exports
+ * @api private
+ */
 
-  localRequire.exists = function(path) {
-    return require.modules.hasOwnProperty(localRequire.resolve(path));
+require.define = function (name, exports) {
+  require.modules[name] = {
+    exports: exports
   };
-
-  return localRequire;
 };
-require.register("azure-table/vendor/superagent.js", function(exports, require, module){
-;(function(){
-
-/**
- * Require the given path.
- *
- * @param {String} path
- * @return {Object} exports
- * @api public
- */
-
-function require(path, parent, orig) {
-  var resolved = require.resolve(path);
-
-  // lookup failed
-  if (null == resolved) {
-    orig = orig || path;
-    parent = parent || 'root';
-    var err = new Error('Failed to require "' + orig + '" from "' + parent + '"');
-    err.path = orig;
-    err.parent = parent;
-    err.require = true;
-    throw err;
-  }
-
-  var module = require.modules[resolved];
-
-  // perform real require()
-  // by invoking the module's
-  // registered function
-  if (!module._resolving && !module.exports) {
-    var mod = {};
-    mod.exports = {};
-    mod.client = mod.component = true;
-    module._resolving = true;
-    module.call(this, mod.exports, require.relative(resolved), mod);
-    delete module._resolving;
-    module.exports = mod.exports;
-  }
-
-  return module.exports;
-}
-
-/**
- * Registered modules.
- */
-
-require.modules = {};
-
-/**
- * Registered aliases.
- */
-
-require.aliases = {};
-
-/**
- * Resolve `path`.
- *
- * Lookup:
- *
- *   - PATH/index.js
- *   - PATH.js
- *   - PATH
- *
- * @param {String} path
- * @return {String} path or null
- * @api private
- */
-
-require.resolve = function(path) {
-  if (path.charAt(0) === '/') path = path.slice(1);
-
-  var paths = [
-    path,
-    path + '.js',
-    path + '.json',
-    path + '/index.js',
-    path + '/index.json'
-  ];
-
-  for (var i = 0; i < paths.length; i++) {
-    var path = paths[i];
-    if (require.modules.hasOwnProperty(path)) return path;
-    if (require.aliases.hasOwnProperty(path)) return require.aliases[path];
-  }
-};
-
-/**
- * Normalize `path` relative to the current path.
- *
- * @param {String} curr
- * @param {String} path
- * @return {String}
- * @api private
- */
-
-require.normalize = function(curr, path) {
-  var segs = [];
-
-  if ('.' != path.charAt(0)) return path;
-
-  curr = curr.split('/');
-  path = path.split('/');
-
-  for (var i = 0; i < path.length; ++i) {
-    if ('..' == path[i]) {
-      curr.pop();
-    } else if ('.' != path[i] && '' != path[i]) {
-      segs.push(path[i]);
-    }
-  }
-
-  return curr.concat(segs).join('/');
-};
-
-/**
- * Register module at `path` with callback `definition`.
- *
- * @param {String} path
- * @param {Function} definition
- * @api private
- */
-
-require.register = function(path, definition) {
-  require.modules[path] = definition;
-};
-
-/**
- * Alias a module definition.
- *
- * @param {String} from
- * @param {String} to
- * @api private
- */
-
-require.alias = function(from, to) {
-  if (!require.modules.hasOwnProperty(from)) {
-    throw new Error('Failed to alias "' + from + '", it does not exist');
-  }
-  require.aliases[to] = from;
-};
-
-/**
- * Return a require function relative to the `parent` path.
- *
- * @param {String} parent
- * @return {Function}
- * @api private
- */
-
-require.relative = function(parent) {
-  var p = require.normalize(parent, '..');
-
-  /**
-   * lastIndexOf helper.
-   */
-
-  function lastIndexOf(arr, obj) {
-    var i = arr.length;
-    while (i--) {
-      if (arr[i] === obj) return i;
-    }
-    return -1;
-  }
-
-  /**
-   * The relative require() itself.
-   */
-
-  function localRequire(path) {
-    var resolved = localRequire.resolve(path);
-    return require(resolved, parent, path);
-  }
-
-  /**
-   * Resolve relative to the parent.
-   */
-
-  localRequire.resolve = function(path) {
-    var c = path.charAt(0);
-    if ('/' == c) return path.slice(1);
-    if ('.' == c) return require.normalize(p, path);
-
-    // resolve deps by returning
-    // the dep in the nearest "deps"
-    // directory
-    var segs = parent.split('/');
-    var i = lastIndexOf(segs, 'deps') + 1;
-    if (!i) i = 0;
-    path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
-    return path;
-  };
-
-  /**
-   * Check if module is defined at `path`.
-   */
-
-  localRequire.exists = function(path) {
-    return require.modules.hasOwnProperty(localRequire.resolve(path));
-  };
-
-  return localRequire;
-};
-require.register("component-emitter/index.js", function(exports, require, module){
+require.register("component~emitter@1.1.2", function (exports, module) {
 
 /**
  * Expose `Emitter`.
@@ -570,7 +222,8 @@ Emitter.prototype.hasListeners = function(event){
 };
 
 });
-require.register("RedVentures-reduce/index.js", function(exports, require, module){
+
+require.register("component~reduce@1.0.1", function (exports, module) {
 
 /**
  * Reduce `arr` with `fn`.
@@ -596,13 +249,14 @@ module.exports = function(arr, fn, initial){
   return curr;
 };
 });
-require.register("superagent/lib/client.js", function(exports, require, module){
+
+require.register("visionmedia~superagent@0.18.0", function (exports, module) {
 /**
  * Module dependencies.
  */
 
-var Emitter = require('emitter');
-var reduce = require('reduce');
+var Emitter = require("component~emitter@1.1.2");
+var reduce = require("component~reduce@1.0.1");
 
 /**
  * Root reference for iframes.
@@ -1015,13 +669,13 @@ Response.prototype.setStatusProperties = function(status){
 Response.prototype.toError = function(){
   var req = this.req;
   var method = req.method;
-  var path = req.path;
+  var url = req.url;
 
-  var msg = 'cannot ' + method + ' ' + path + ' (' + this.status + ')';
+  var msg = 'cannot ' + method + ' ' + url + ' (' + this.status + ')';
   var err = new Error(msg);
   err.status = this.status;
   err.method = method;
-  err.path = path;
+  err.url = url;
 
   return err;
 };
@@ -1060,6 +714,15 @@ function Request(method, url) {
  */
 
 Emitter(Request.prototype);
+
+/**
+ * Allow for extension
+ */
+
+Request.prototype.use = function(fn) {
+  fn(this);
+  return this;
+}
 
 /**
  * Set timeout to `ms`.
@@ -1235,6 +898,51 @@ Request.prototype.query = function(val){
 };
 
 /**
+ * Write the field `name` and `val` for "multipart/form-data"
+ * request bodies.
+ *
+ * ``` js
+ * request.post('/upload')
+ *   .field('foo', 'bar')
+ *   .end(callback);
+ * ```
+ *
+ * @param {String} name
+ * @param {String|Blob|File} val
+ * @return {Request} for chaining
+ * @api public
+ */
+
+Request.prototype.field = function(name, val){
+  if (!this._formData) this._formData = new FormData();
+  this._formData.append(name, val);
+  return this;
+};
+
+/**
+ * Queue the given `file` as an attachment to the specified `field`,
+ * with optional `filename`.
+ *
+ * ``` js
+ * request.post('/upload')
+ *   .attach(new Blob(['<a id="a"><b id="b">hey!</b></a>'], { type: "text/html"}))
+ *   .end(callback);
+ * ```
+ *
+ * @param {String} field
+ * @param {Blob|File} file
+ * @param {String} filename
+ * @return {Request} for chaining
+ * @api public
+ */
+
+Request.prototype.attach = function(field, file, filename){
+  if (!this._formData) this._formData = new FormData();
+  this._formData.append(field, file, filename);
+  return this;
+};
+
+/**
  * Send `data`, defaulting the `.type()` to "json" when
  * an object is given.
  *
@@ -1384,7 +1092,7 @@ Request.prototype.end = function(fn){
   var xhr = this.xhr = getXHR();
   var query = this._query.join('&');
   var timeout = this._timeout;
-  var data = this._data;
+  var data = this._formData || this._data;
 
   // store callback
   this._callback = fn || noop;
@@ -1442,6 +1150,7 @@ Request.prototype.end = function(fn){
   }
 
   // send stuff
+  this.emit('request', this);
   xhr.send(data);
   return this;
 };
@@ -1594,196 +1303,371 @@ module.exports = request;
 
 });
 
+require.register("lightsofapollo~superagent-promise@0.1.1", function (exports, module) {
+/**
+ * Promise wrapper for superagent
+ */
 
+var superagent  = require("visionmedia~superagent@0.18.0");
 
-
-require.alias("component-emitter/index.js", "superagent/deps/emitter/index.js");
-require.alias("component-emitter/index.js", "emitter/index.js");
-
-require.alias("RedVentures-reduce/index.js", "superagent/deps/reduce/index.js");
-require.alias("RedVentures-reduce/index.js", "reduce/index.js");
-
-require.alias("superagent/lib/client.js", "superagent/index.js");if (typeof exports == "object") {
-  module.exports = require("superagent");
-} else if (typeof define == "function" && define.amd) {
-  define(function(){ return require("superagent"); });
-} else {
-  this["superagent"] = require("superagent");
-}})();
-
-});
-require.register("azure-table/client.js", function(exports, require, module){
-var superagent = require('./vendor/superagent');
+// in the browser Promise is expected to be defined.
+var Promise = this.Promise || require("promise");
 
 /**
-Convert a callback style method to a promise returning method.
+ * Request object similar to superagent.Request, but with end() returning
+ * a promise.
+ */
+function PromiseRequest() {
+  superagent.Request.apply(this, arguments);
+}
 
-@param {Function} method to use.
-@param {Object} ctx to apply method.
-*/
-function denodeify(method, ctx) {
-  return function() {
-    var args = Array.prototype.slice.call(arguments);
+// Inherit form superagent.Request
+PromiseRequest.prototype = Object.create(superagent.Request.prototype);
 
-    return new Promise(function(accept, reject) {
-      args.push(function(err, value) {
-        if (err) return reject(err);
-        return accept(value);
-      });
+/** Send request and get a promise that `end` was emitted */
+PromiseRequest.prototype.end = function() {
+  var _super = superagent.Request.prototype.end;
+  var context = this;
 
-      method.apply(ctx, args);
+  return new Promise(function(accept, reject) {
+    _super.call(context, function(err, value) {
+      if (err) {
+        return reject(err);
+      }
+      accept(value);
     });
-  };
-}
-
-/**
-Wrap a method to ensure we have a signature before sending it.
-*/
-function ensureSignature(method) {
-  return function() {
-    var args = Array.prototype.slice.call(arguments);
-
-    if (this.host && this.query) {
-      return method.apply(this, args);
-    }
-
-    this._pendingSignature =
-      this._pendingSignature || this.fetchSharedSignature();
-
-    return this._pendingSignature.then(function() {
-      return method.apply(this, args);
-    }.bind(this));
-  };
-}
-
-/**
-Create the superagent request and add the constant values.
-
-@param {String} method to use.
-@param {String} path for superagent.
-@return {Request}
-*/
-function request(method, path) {
-  var req = superagent(method, path);
-  req.set('Accept', 'application/json;odata=nometadata');
-  req.end = denodeify(req.end, req);
-
-  return req;
-}
-
-function validateStatus(promise) {
-  return promise.then(function(res) {
-    if (!res.ok) {
-      var body = res.body;
-      var error = body['odata.error'];
-
-      var err = new Error(
-        'Reponse is not ok - ' + res.status + '\n' +
-        error.code
-      );
-
-      err.reponse = res;
-      throw err;
-    }
-    return res.body;
   });
-}
-
-/**
-Configure the table client
-
-@param {Object} options for client.
-@param {String} options.signUrl where to fetch credentials from.
-*/
-function Client(options) {
-  this.signUrl = options.signUrl;
-}
-
-Client.prototype = {
-  /**
-  @type {String} host for the client requests.
-  */
-  host: '',
-
-  /**
-  Query parameters to use for all requests.
-
-  @type{Object}
-  */
-  query: null,
-
-  _request: function(method, path) {
-    var url = this.host + '/' + path;
-    return request(method, url).
-              set('x-ms-version', '2013-08-15').
-              query(this.query);
-  },
-
-  /**
-  Insert an entity into the azure table.
-  @param {Object} object to insert into azure.
-  @return {Promise}
-  */
-  insertEntity: ensureSignature(function(object) {
-    var req = this._request('POST', this.table);
-    req.send(object);
-    return validateStatus(req.end());
-  }),
-
-  /**
-  Building block for queries (does not return a promise)
-
-  @param {Object} query parameters to pass directly to azure.
-  @return {Request}
-  */
-  buildQuery: ensureSignature(function(query) {
-    var url = this.table + '()';
-    var req = this._request('GET', url);
-    req.query(query);
-    return validateStatus(req.end()).then(function(result) {
-      return result.value;
-    });
-  }),
-
-  /**
-  Update the shared signature details so we can talk to azure.
-
-  @param {String} host to issue requests to.
-  @param {Object} query signed credentials.
-  */
-  setSharedSignature: function(table, host, query) {
-    this.table = table;
-    this.host = host;
-    this.query = query;
-  },
-
-  /**
-  Get the shared signature from the sign url.
-  */
-  fetchSharedSignature: function() {
-    // fetch the new signature
-    return request('POST', this.signUrl).end().then(
-      function gotSigned(value) {
-        var body = value.body;
-        this.setSharedSignature(
-          body.table,
-          body.host,
-          body.query
-        );
-
-      }.bind(this)
-    );
-  },
-
 };
 
-module.exports = Client;
+/**
+ * Request builder with same interface as superagent.
+ * It is convenient to import this as `request` in place of superagent.
+ */
+var request = function(method, url) {
+  return new PromiseRequest(method, url);
+};
+
+/** Helper for making a get request */
+request.get = function(url, data) {
+  var req = request('GET', url);
+  if (data) {
+    req.query(data);
+  }
+  return req;
+};
+
+/** Helper for making a head request */
+request.head = function(url, data) {
+  var req = request('HEAD', url);
+  if (data) {
+    req.send(data);
+  }
+  return req;
+};
+
+/** Helper for making a delete request */
+request.del = function(url) {
+  return request('DELETE', url);
+};
+
+/** Helper for making a patch request */
+request.patch = function(url, data) {
+  var req = request('PATCH', url);
+  if (data) {
+    req.send(data);
+  }
+  return req;
+};
+
+/** Helper for making a post request */
+request.post = function(url, data) {
+  var req = request('POST', url);
+  if (data) {
+    req.send(data);
+  }
+  return req;
+};
+
+/** Helper for making a put request */
+request.put = function(url, data) {
+  var req = request('PUT', url);
+  if (data) {
+    req.send(data);
+  }
+  return req;
+};
+
+// Export the request builder
+module.exports = request;
 
 });
-require.alias("azure-table/client.js", "azure-table/index.js");if (typeof exports == "object") {
+
+require.register("azure-table/adapter/fetch_signature.js", function (exports, module) {
+/**
+@fileoverview
+
+The fetch signature method is designed for browser usage (though it will work in node)
+it expects the server at a particular url to return a signed signature.
+
+For example if your url is set to `/azure/sign` then azure sign would be expected to respond
+with a json body like this:
+
+  {
+    host: 'https://..',
+    // table SAS query parameters
+    query: { rv: '..' }
+  }
+
+*/
+
+var superagent = require("lightsofapollo~superagent-promise@0.1.1");
+
+function signRequestWithSAS(request, sas) {
+  request.url = sas.host + '/' + request.url;
+  request.query(sas.query);
+}
+
+function adapter(url) {
+  // in memory cache for this adapter;
+  var sasRequest = null;
+  var cache = null;
+
+  function fetchSas() {
+    // only issue one sas request per adapter
+    if (sasRequest) return sasRequest;
+    return sasRequest = superagent.post(url).
+      end().
+      then(function(res) {
+        if (res.error) throw res.error;
+        return res.body;
+      });
+  }
+
+  return function(subject) {
+    var end = subject.end;
+
+    subject.end = function() {
+      var args = arguments;
+
+      if (cache) {
+        signRequestWithSAS(subject, cache);
+        return end.apply(subject, args);
+      }
+
+      return fetchSas().then(function(sas) {
+        cache = sas;
+        signRequestWithSAS(subject, sas);
+        return end.apply(subject, args);
+      });
+    };
+  };
+
+}
+
+module.exports = adapter;
+
+});
+
+require.register("azure-table/request.js", function (exports, module) {
+/**
+@module azure-table/request
+
+The request module handles creation of http request for azure resources. The Goal
+is to provide a minimal level of abstraction on top of http so high level abstractions
+can be built without compromising low level capabilities.
+*/
+
+var request = require("lightsofapollo~superagent-promise@0.1.1");
+
+function tableUrl(table, options) {
+  if (!options) return table;
+
+  var params = Object.keys(options).map(function(key) {
+    // XXX: should this be url encoded?
+    return key + '=\'' + options[key] + '\'';
+  });
+
+  return table + '(' + params.join(', ') + ')';
+}
+
+function onResponse(request, fn) {
+  var end = request.end;
+
+  request.end = function overloadResponse() {
+    var promise = end.apply(this, arguments);
+    return promise.then(fn);
+  };
+}
+
+function assertResponseOk(res) {
+  if (res.error) {
+    throw res.error;
+  }
+  return res;
+}
+
+/**
+The request object is designed around a specific table and provides azure http verbs (like inserting a entity)
+for that table. Most methods return a Superagent request and can be extended at will.
+
+
+@constructor
+@alias module:azure-table/request
+@param {String} tableName for this request object.
+@param {Object} adapter (one of azure-table/adapter/* or your own)
+@example
+
+  var table = new Request('myTable', require('azure-table/adapter/fetch_signature')('/url'));
+
+  var req = table.insertEntity({
+    PartitionKey: 'xfoo',
+    RowKey: 'bar'
+  });
+
+  req.set('Prefer', 'no-return');
+
+  // XXX: note we wrap superagent with superagent-promise so promises are
+  // returned on .end.
+  req.end().then(function(res) {
+    // ...
+  });
+
+*/
+function Request(tableName, adapter) {
+  this.table = tableName;
+  this.adapter = adapter;
+
+  this.headers = {
+    // ensure we are always using the right version of azure
+    'x-ms-version': '2013-08-15',
+
+    // default to minimalistic json
+    'Accept':       'application/json'
+  };
+}
+
+Request.prototype = {
+  headers: null,
+
+  /**
+  Build a superagent request from url and method and apply the adapter
+  and any common headers to the request.
+
+  @param {String} url for the request (not including host!)
+  @param {String} method for the request.
+  @return {Superagent}
+  */
+  request: function(url, method) {
+    var req = request(url, method);
+
+    // validator adapter can manip
+    this.adapter(req);
+
+    // XXX: This _must_ come after adapter so we can set the host in node.
+    req.set(this.headers);
+
+    // Add validator to the promise chain.
+    onResponse(req, assertResponseOk);
+
+    return req;
+  },
+
+  /**
+  Set global headers for all requests (like setting Accept, x-ms-version, etc..)
+
+  @param {Object|String} objectOrKey for setting headers.
+  @param {String} [value] header value.
+  */
+  set: function(key, value) {
+    if (typeof key === 'object') {
+      var object = key;
+      for (field in object) this.set(field, object[field]);
+      return;
+    }
+    this.headers[key] = value;
+  },
+
+  /**
+  Build an http request for a query.
+
+  @param {Object} options to limit query (these are not headers)
+  @see http://msdn.microsoft.com/en-us/library/azure/dd179405.aspx
+  @return {Superagent}
+  */
+  query: function(options) {
+    var req = this.request(
+      'GET',
+      tableUrl(this.table, options || {})
+    );
+
+    return req;
+  },
+
+  /**
+  This method is a shortcut for a common operation of fetching a single entity by it's 
+  RowKey & PartitionKey and is a wrapper for the `query` method.
+
+  @see http://msdn.microsoft.com/en-us/library/azure/dd179421.aspx
+  @return {Superagent}
+  */
+  getEntity: function(entity) {
+    return this.query({
+      RowKey: entity.RowKey,
+      PartitionKey: entity.PartitionKey
+    })
+  },
+
+  /**
+  Begin an insert (POST) entity operation.
+
+  @see http://msdn.microsoft.com/en-us/library/azure/dd179421.aspx
+  @param {Object} entity.
+  @return {Superagent}
+  */
+  insertEntity: function(entity) {
+    return this.request('POST', this.table).send(entity);
+  },
+
+  /**
+  Merge new data into an existing entity.
+
+  @see http://msdn.microsoft.com/en-us/library/azure/dd179392.aspx
+  @param {Object} entity.
+  @return {Superagent}
+  */
+  mergeEntity: function(entity) {
+    var req = this.request(
+      'MERGE',
+      tableUrl(this.table, { RowKey: entity.RowKey, PartitionKey: entity.PartitionKey })
+    );
+    req.send(entity);
+    return req;
+  },
+
+  /**
+  Delete an entity from the table, note that you _must_ set the `If-Match` header.
+
+  @see http://msdn.microsoft.com/en-us/library/azure/dd135727.aspx
+  @param {Object} entity.
+  @return {Superagent}
+  */
+  deleteEntity: function(entity) {
+    return this.request(
+      'DELETE',
+      tableUrl(this.table, { RowKey: entity.RowKey, PartitionKey: entity.PartitionKey })
+    );
+  }
+};
+
+module.exports = Request;
+
+});
+
+if (typeof exports == "object") {
   module.exports = require("azure-table");
 } else if (typeof define == "function" && define.amd) {
   define([], function(){ return require("azure-table"); });
 } else {
   this["AzureTable"] = require("azure-table");
-}})();
+}
+})()

@@ -6,8 +6,7 @@
   "keywords": [],
   "dependencies": {
     "visionmedia/superagent": "~0.18.0",
-    "lightsofapollo/superagent-promise": "0.1.1",
-    "component/assert": "~0.3.0"
+    "lightsofapollo/superagent-promise": "0.1.1"
   },
   "development": {
     "dependencies": {
@@ -17,13 +16,14 @@
       "test/records.js",
       "test/request.js",
       "test/config/*.js",
+      "adapter/*.js",
       "*_test.js"
     ]
   },
   "license": "MIT",
   "main": "index.js",
   "scripts": [
-    "adapter/*.js",
+    "adapter/fetch_signature.js",
     "request.js"
   ]
 }
