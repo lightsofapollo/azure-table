@@ -1,12 +1,11 @@
 suite('request', function() {
-  var config = require('./test/config');
   var assert = require('chai').assert;
   var adapter = require('./adapter/fetch_signature');
-  var Client = require('./request');
+  var getRequest = require('./test/request');
 
   var subject;
   setup(function() {
-    subject = new Client(config.table, adapter(config.url));
+    subject = getRequest();
     subject.set({
       'Accept': 'application/json;odata=nometadata'
     });

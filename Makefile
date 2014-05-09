@@ -1,5 +1,6 @@
 SRC := $(wildcard *.js)
 DEV_SRC := $(wildcard test/*.js)
+TESTS := $(wildcard *_test.js)
 
 build: build/azure_table.js
 
@@ -14,6 +15,15 @@ build/azure_table.js: $(SRC)
 .PHONY: clean
 clean:
 	rm -fr build
+
+.PHONY: test-node
+test-node:
+	./node_modules/.bin/mocha $(TESTS)
+
+test-browser:
+	echo $(TESTS) | xargs -P 1000 -n 1 ./node_modules/.bin/browser-test
+
+test: test-node test-browser
 
 .PHONY: server
 server:

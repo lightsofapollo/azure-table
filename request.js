@@ -31,7 +31,10 @@ function Table(tableName, adapter) {
   this.table = tableName;
   this.adapter = adapter;
 
-  this.headers = {};
+  this.headers = {
+    // ensure we are always using the right version of azure
+    'x-ms-version': '2013-08-15'
+  };
 }
 
 Table.prototype = {
@@ -39,10 +42,12 @@ Table.prototype = {
 
   _request: function(url, method) {
     var req = request(url, method);
-    req.set(this.headers);
 
     // validator adapter can manip
     this.adapter(req);
+
+    // XXX: This _must_ come after adapter so we can set the host in node.
+    req.set(this.headers);
 
     // Add validator to the promise chain.
     onResponse(req, assertResponseOk);

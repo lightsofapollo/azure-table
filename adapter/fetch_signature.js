@@ -1,3 +1,20 @@
+/**
+@fileoverview
+
+The fetch signature method is designed for browser usage (though it will work in node)
+it expects the server at a particular url to return a signed signature.
+
+For example if your url is set to `/azure/sign` then azure sign would be expected to respond
+with a json body like this:
+
+  {
+    host: 'https://..',
+    // table SAS query parameters
+    query: { rv: '..' }
+  }
+
+*/
+
 var superagent = require('superagent-promise');
 
 function signRequestWithSAS(request, sas) {
