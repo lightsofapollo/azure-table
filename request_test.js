@@ -1,4 +1,4 @@
-suite('index', function() {
+suite('request', function() {
   var config = require('./test/config');
   var assert = require('chai').assert;
   var adapter = require('./adapter/fetch_signature');
