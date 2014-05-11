@@ -2,7 +2,7 @@ var URL = require('url');
 var azure = require('azure');
 var azureSAS = require('azure-sas');
 var tableService = azure.createTableService();
-var config = require('./config');
+var config = require('./config/defaults');
 var express = require('express');
 var cors = require('cors');
 

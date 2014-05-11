@@ -182,6 +182,20 @@ Request.prototype = {
       'DELETE',
       tableUrl(this.table, { RowKey: entity.RowKey, PartitionKey: entity.PartitionKey })
     );
+  },
+
+  createTable: function() {
+    var req = this.request('POST', 'Tables');
+    req.send({ TableName: this.table });
+
+    return req;
+  },
+
+  deleteTable: function() {
+    return this.request(
+      'DELETE',
+      'Tables(\'' + this.table + '\')'
+    );
   }
 };
 

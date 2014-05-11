@@ -22,6 +22,23 @@ suite('request', function() {
     }
   });
 
+  suite('#createTable/deleteTable', function() {
+    var tableName = 'magiclyDeleteCreateTable_' + Date.now();
+
+    setup(function() {
+      return subject.createTable();
+    });
+
+    test('delete table', function() {
+      // create an entity...
+      return subject.insertEntity(entity).
+        end().
+        then(function() {
+          return subject.deleteTable();
+        });
+    });
+  });
+
   suite('#getEntity / #insertEntity', function() {
     setup(function() {
       return subject.
