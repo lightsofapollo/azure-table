@@ -1,9 +1,15 @@
 var config = require('./defaults');
-var fetchSignature = require('../../adapter/fetch_signature');
+var superagent = require('superagent-promise');
+var adapter = require('../../adapter/shared_signature');
 
 module.exports = function() {
-  return {
-    table: config.table,
-    adapter: fetchSignature(config.url)
-  };
+
+  var req = superagent.post(config.url).end();
+
+  return req.then(function(res) {
+    return {
+      table: config.table,
+      adapter: adapter(res.body)
+    }
+  });
 };

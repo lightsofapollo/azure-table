@@ -1,11 +1,20 @@
+var Promise = this.Promise || require('' + 'promise');
+
 suite('request', function() {
   var assert = require('chai').assert;
-  var adapter = require('./adapter/fetch_signature');
-  var getRequest = require('./test/request');
+  var Request = require('./request');
+
+  var config;
+  setup(function() {
+    return Promise.resolve(require('./test/config')()).
+      then(function(_config) {
+        config = _config;
+      });
+  });
 
   var subject;
   setup(function() {
-    subject = getRequest();
+    subject = new Request(config.table, config.adapter);
     subject.set({
       'Accept': 'application/json;odata=nometadata'
     });

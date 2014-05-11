@@ -14,7 +14,7 @@
     },
     "scripts": [
       "test/records.js",
-      "test/request.js",
+      "test/config.js",
       "test/config/*.js",
       "adapter/*.js",
       "*_test.js"
@@ -23,7 +23,7 @@
   "license": "MIT",
   "main": "browser.js",
   "scripts": [
-    "adapter/fetch_signature.js",
+    "adapter/shared_signature.js",
     "request.js"
   ]
 }

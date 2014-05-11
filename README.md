@@ -8,10 +8,11 @@ Azure table library for node & browsers
 to show the common js version).
 
 ```js
-var adapter = require('azure-table/adapter/fetch_signature')(
-  // XXX: See test/server for example of what the server should domains
-  '/azure/sign'
-);
+var adapter = require('azure-table/adapter/shared_signature')({
+  // XXX: see azure-sign package which can generate this for you
+  host: 'http://...',
+  query: '...'
+});
 
 // requests see test/server.js for an example server implementation.
 var table = require('azure-table/request')(

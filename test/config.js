@@ -14,5 +14,5 @@ module.exports = function() {
     config = require('./config/node')();
   }
 
-  return new Request(config.table, config.adapter);
+  return config;
 };
